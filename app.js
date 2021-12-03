@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const todoRoutes = require('./routes/todoRoutes');
+const userRouter = require('./routes/userRoutes');
 const { initialiseDb } = require('./utils/mongo');
 
 const app = express();
@@ -12,7 +13,9 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+
 app.use('/api/todo', todoRoutes);
+app.use('/api/user', userRouter);
 
 const port = 5000;
 

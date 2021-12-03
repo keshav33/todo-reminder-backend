@@ -14,7 +14,7 @@ exports.insertTodo = (todoBody) => {
     })
 }
 
-exports.getAlTodos = () => {
+exports.getAllTodos = () => {
     return new Promise((resolve, reject) => {
         const db = getDb();
         db.collection('todos').find({}).toArray((err, result) => {
@@ -32,6 +32,21 @@ exports.deleteTodo = (id) => {
         const db = getDb();
         const query = { _id: new mongodb.ObjectID(id) };
         db.collection('todos').deleteOne(query, (err) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve();
+            }
+        })
+    })
+}
+
+exports.setCompleted = (id, checked) => {
+    return new Promise((resolve, reject) => {
+        const db = getDb();
+        const query = { _id: new mongodb.ObjectID(id) };
+        const update = { $set: { completed: checked } };
+        db.collection('todos').updateOne(query, update, (err) => {
             if (err) {
                 reject(err);
             } else {
