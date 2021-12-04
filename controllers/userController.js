@@ -4,7 +4,6 @@ const {
 } = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const e = require('express');
 
 exports.userSignup = (req, res) => {
     const user = req.body
