@@ -4,9 +4,10 @@ const {
     deleteTodo,
     setCompleted
 } = require('../models/todoModel')
+const { scheduleEmail } = require('../utils/scheduleEmail')
 
 exports.getAllTodos = (req, res) => {
-    getAllTodos()
+    getAllTodos(req.user)
     .then(result => {
         res.status(200).send(result)
     }).catch(err => {
@@ -19,18 +20,27 @@ exports.addTodo = (req, res) => {
     const {todo, reminderDateTime, completed} = req.body;
     const date = reminderDateTime.split('T')[0];
     const time = reminderDateTime.split('T')[1];
+    const {username, email} = req.user;
     const todoBody = {
+        username,
+        email,
         todo,
         date,
         time,
         completed
     };
-    insertTodo(todoBody)
+    scheduleEmail(email, todo, date, time)
     .then(() => {
-        res.status(202).send('Ok');
+        insertTodo(todoBody)
+        .then(() => {
+            res.status(202).send('Ok');
+        }).catch(err => {
+            console.log(err);
+            res.status(500).send({message: 'Unable To Add Todo!', code: 500});
+        })
     }).catch(err => {
         console.log(err);
-        res.status(500).send({message: 'Unable To Insert Data', code: 500});
+        res.status(500).send({message: 'Unable To Schedule Reminder!', code: 500});
     })
 }
 

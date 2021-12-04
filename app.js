@@ -8,7 +8,12 @@ const { initialiseDb } = require('./utils/mongo');
 
 const app = express();
 
-app.use(cors());
+app.use(cors(
+    {
+        origin: process.env.FRONTEND_URL,
+        methods: 'GET,PUT,POST,DELETE'
+    }
+));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

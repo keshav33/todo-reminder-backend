@@ -14,14 +14,26 @@ exports.insertTodo = (todoBody) => {
     })
 }
 
-exports.getAllTodos = () => {
+exports.getAllTodos = (user) => {
+    const { email } = user;
     return new Promise((resolve, reject) => {
         const db = getDb();
-        db.collection('todos').find({}).toArray((err, result) => {
+        db.collection('users').aggregate([
+            {
+                $lookup:
+                {
+                    from: 'todos',
+                    localField: 'email',
+                    foreignField: 'email',
+                    as: 'userTodos'
+                }
+            }
+        ]).toArray((err, result) => {
             if (err) {
                 reject(err);
             } else {
-                resolve(result)
+                const userTodos = result.find(res => res.email === email);
+                resolve(userTodos);
             }
         });
     })
