@@ -20,6 +20,9 @@ exports.getAllTodos = (user) => {
         const db = getDb();
         db.collection('users').aggregate([
             {
+                $match: { email: email }
+            },
+            {
                 $lookup:
                 {
                     from: 'todos',
@@ -32,7 +35,7 @@ exports.getAllTodos = (user) => {
             if (err) {
                 reject(err);
             } else {
-                const userTodos = result.find(res => res.email === email);
+                const userTodos = result[0]
                 resolve(userTodos);
             }
         });
