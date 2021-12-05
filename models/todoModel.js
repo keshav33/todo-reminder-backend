@@ -23,6 +23,11 @@ exports.getAllTodos = (user) => {
                 $match: { email: email }
             },
             {
+                $project: {
+                    password: 0
+                }
+            },
+            {
                 $lookup:
                 {
                     from: 'todos',
