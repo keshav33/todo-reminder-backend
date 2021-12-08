@@ -1,8 +1,9 @@
-const mailgun = require("mailgun-js");
+const mailgun = require('mailgun-js');
+const axios = require('axios');
 
 exports.scheduleEmail = (receiverEmail, todo, receiverDate, time) => {
     return new Promise((resolve, reject) => {
-        if (process.env.ENABLE_REMINDER === 'true') {
+        if (process.env.ENABLE_MAILGUN_REMINDER === 'true') {
             const DOMAIN = process.env.MAILGUN_DOMAIN;
             const apiKey = process.env.MAILGUN_APIKEY;
             const senderEmail = process.env.SENDER_EMAILID;
@@ -27,7 +28,16 @@ exports.scheduleEmail = (receiverEmail, todo, receiverDate, time) => {
                 }
             });
         } else {
-            resolve();
+            axios.post(`${process.env.REMINDER_APP_URL}/schedule/mail`, {
+                todo,
+                receiverEmail,
+                receiverDate,
+                time
+            }).then(() => {
+                resolve();
+            }).catch(err => {
+                reject(err);
+            })
         }
     })
 }
