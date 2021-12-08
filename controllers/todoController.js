@@ -4,7 +4,7 @@ const {
     deleteTodo,
     setCompleted
 } = require('../models/todoModel')
-const { scheduleEmail } = require('../utils/scheduleEmail')
+const { scheduleEmail, cancelSchedule } = require('../utils/scheduleEmail')
 
 exports.getAllTodos = (req, res) => {
     getAllTodos(req.user)
@@ -21,6 +21,7 @@ exports.addTodo = (req, res) => {
     const date = reminderDateTime.split('T')[0];
     const time = reminderDateTime.split('T')[1];
     const {username, email} = req.user;
+
     const todoBody = {
         username,
         email,
@@ -29,18 +30,19 @@ exports.addTodo = (req, res) => {
         time,
         completed
     };
-    scheduleEmail(email, todo, date, time)
-    .then(() => {
-        insertTodo(todoBody)
+
+    insertTodo(todoBody)
+    .then((id) => {
+        scheduleEmail(email, todo, date, time, id)
         .then(() => {
             res.status(202).send('Ok');
         }).catch(err => {
-            console.log(err);
-            res.status(500).send({message: 'Unable To Add Todo!', code: 500});
+            console.log(err)
+            res.status(500).send({message: 'Unable To Schedule Todo!', code: 500});
         })
     }).catch(err => {
         console.log(err);
-        res.status(500).send({message: 'Unable To Schedule Reminder!', code: 500});
+        res.status(500).send({message: 'Unable To Add Todo!', code: 500});
     })
 }
 
@@ -48,7 +50,13 @@ exports.deleteTodoById = (req, res) => {
     const id = req.params.id;
     deleteTodo(id)
     .then(() => {
-        res.status(202).send('Deleted');
+        cancelSchedule(id)
+        .then(() => {
+            res.status(202).send('Deleted');
+        }).catch(err => {
+            console.log(err)
+            res.status(500).send({message: 'Unable To Cancel Schedule', code: 500});
+        })
     }).catch(err => {
         console.log(err);
         res.status(500).send({message: 'Unable To Delete', code: 500});

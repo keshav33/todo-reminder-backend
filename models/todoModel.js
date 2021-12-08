@@ -4,11 +4,11 @@ const mongodb = require('mongodb');
 exports.insertTodo = (todoBody) => {
     return new Promise((resolve, reject) => {
         const db = getDb();
-        db.collection('todos').insertOne(todoBody, (err) => {
+        db.collection('todos').insertOne(todoBody, (err, result) => {
             if (err) {
                 reject(err);
             } else {
-                resolve();
+                resolve(result.insertedId.toString());
             }
         });
     })
